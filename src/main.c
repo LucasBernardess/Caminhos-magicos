@@ -1,5 +1,5 @@
 #include "../include/graph.h"
-#include "../include/dijkstra].h"
+#include "../include/dijkstra.h"
 #include "../include/file_io.h"
 #include <stdio.h>
 #include <stdlib.h>
