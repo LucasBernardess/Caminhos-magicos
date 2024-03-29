@@ -1,4 +1,4 @@
-#include "dijkstra.h"
+#include "../include/dijkstra].h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>

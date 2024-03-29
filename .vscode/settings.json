@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "dijkstra.h": "c",
+        "stdio.h": "c",
+        "file_io.h": "c",
+        "stdlib.h": "c",
+        "graph.h": "c",
+        "resource.h": "c"
+    }
+}

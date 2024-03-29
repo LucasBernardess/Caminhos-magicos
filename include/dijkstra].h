@@ -4,7 +4,7 @@
 #include "graph.h"
 #include "heap.h"
 
-// Declaração da função para encontrar os k caminhos mais curtos usando o algoritmo de Dijkstra
+// Finds the k shortest paths from startVertex to endVertex.
 void findKShortestPaths(Graph *graph, int startVertex, int endVertex, int k, const char *outputFile);
 
 #endif
