@@ -2,11 +2,10 @@
 #define FILE_IO_H
 
 #include "graph.h"
+#include "dijkstra.h" // Garanta que DijkstraResult está definido
 
-// Function to read the graph from the input file
-Graph* readGraphFromFile(const char *fileName);
+// Protótipos de funções para operações de entrada e saída de arquivos
+Graph *readGraphFromFile(const char *filename, int *k);
+void writeKShortestPathsToFile(const char *filename, const DijkstraResult *result, int k);
 
-// Function to write the results to the output file
-void writeResultsToFile(const char *fileName, int *distances, int k);
-
-#endif
+#endif // FILE_IO_H

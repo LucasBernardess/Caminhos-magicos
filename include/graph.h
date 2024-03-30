@@ -1,24 +1,31 @@
 #ifndef GRAPH_H
 #define GRAPH_H
 
-#include <stdlib.h>
+#include <stdbool.h>
 
-// Estrutura para representar uma aresta no grafo
+// Estrutura para uma aresta
 typedef struct Edge {
-    int dest;    // Destino da aresta
-    int cost;    // Custo da aresta
-    struct Edge *next; // Próximo nó na lista
+    int dest;           // Destino da aresta
+    int weight;         // Peso da aresta
+    struct Edge *next;  // Próximo nó na lista de adjacências
 } Edge;
 
-// Estrutura para representar a lista de adjacências de cada vértice
-typedef struct {
-    int numVertices; // Número total de vértices no grafo
-    Edge **adjLists; // Array de ponteiros para os nós de aresta
+// Estrutura para um vértice no grafo
+typedef struct Vertex {
+    Edge *head;         // Cabeça da lista de adjacências
+} Vertex;
+
+// Estrutura do grafo
+typedef struct Graph {
+    int numVertices;    // Número de vértices no grafo
+    Vertex *vertices;   // Array de listas de adjacências
 } Graph;
 
-// Funções para manipulação do grafo
-Graph* createGraph(int vertices);
-void addEdge(Graph *graph, int src, int dest, int cost);
+// Protótipos de funções para manipulação de grafos
+Graph *createGraph(int numVertices);
+void addEdge(Graph *graph, int src, int dest, int weight);
+void printGraph(const Graph *graph);
 void freeGraph(Graph *graph);
+char *graphToString(const Graph *graph);  // Representação em string do grafo para depuração
 
-#endif
+#endif // GRAPH_H

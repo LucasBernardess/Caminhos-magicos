@@ -1,63 +1,59 @@
+#include "../include/file_io.h"
 #include "../include/graph.h"
 #include "../include/dijkstra.h"
-#include "../include/file_io.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h> // For getopt
-#include <sys/time.h>
-#include <sys/resource.h>
+#include <string.h>
 
 int main(int argc, char *argv[]) {
-    if (argc != 4) {
-        printf("Uso: %s <arquivo de entrada> <arquivo de saída> <k>\n", argv[0]);
+    char *inputFile = NULL;
+    char *outputFile = NULL;
+    int k;
+
+    // Processar os argumentos da linha de comando
+    if (argc != 5) {
+        fprintf(stderr, "Usage: %s -i inputfile -o outputfile\n", argv[0]);
         return EXIT_FAILURE;
     }
 
-    const char *inputFile = argv[1];
-    const char *outputFile = argv[2];
-    int k = atoi(argv[3]); // Número de c
-   
+    for (int i = 1; i < argc; i += 2) {
+        if (strcmp(argv[i], "-i") == 0) {
+            inputFile = argv[i + 1];
+        } else if (strcmp(argv[i], "-o") == 0) {
+            outputFile = argv[i + 1];
+        } else {
+            fprintf(stderr, "Invalid option %s\n", argv[i]);
+            return EXIT_FAILURE;
+        }
+    }
 
-    // Initialize timing structures
-    struct rusage usageStart, usageEnd;
-    struct timeval userStart, userEnd, sysStart, sysEnd;
-
-    // Time input reading and graph construction
-    getrusage(RUSAGE_SELF, &usageStart);
-    Graph *graph = readGraphFromFile(inputFile);
-    getrusage(RUSAGE_SELF, &usageEnd);
-
-    userStart = usageStart.ru_utime;
-    userEnd = usageEnd.ru_utime;
-    sysStart = usageStart.ru_stime;
-    sysEnd = usageEnd.ru_stime;
-
-    long readUserTime = (userEnd.tv_sec - userStart.tv_sec) * 1000000 + userEnd.tv_usec - userStart.tv_usec;
-    long readSysTime = (sysEnd.tv_sec - sysStart.tv_sec) * 1000000 + sysEnd.tv_usec - sysStart.tv_usec;
-
-    if (!graph) {
-        fprintf(stderr, "Failed to construct graph from file\n");
+    // Verificar se os nomes dos arquivos foram fornecidos
+    if (inputFile == NULL || outputFile == NULL) {
+        fprintf(stderr, "Input file and output file must be specified\n");
         return EXIT_FAILURE;
     }
 
-    // Time the algorithm execution
-    getrusage(RUSAGE_SELF, &usageStart);
-    findKShortestPaths(graph, 0, graph->numVertices - 1, k, outputFile);
-    getrusage(RUSAGE_SELF, &usageEnd);
+    // Ler o grafo do arquivo de entrada
+    Graph *graph = readGraphFromFile(inputFile, &k);
+    if (graph == NULL) {
+        fprintf(stderr, "Erro ao ler o grafo do arquivo.\n");
+        return EXIT_FAILURE;
+    }
 
-    userStart = usageStart.ru_utime;
-    userEnd = usageEnd.ru_utime;
-    sysStart = usageStart.ru_stime;
-    sysEnd = usageEnd.ru_stime;
+    // Executar o algoritmo de Dijkstra
+    DijkstraResult *result = dijkstra(graph, 0, k); // 0 é o vértice de origem
+    if (result == NULL) {
+        fprintf(stderr, "Erro ao executar o algoritmo de Dijkstra.\n");
+        freeGraph(graph);
+        return EXIT_FAILURE;
+    }
 
-    long algoUserTime = (userEnd.tv_sec - userStart.tv_sec) * 1000000 + userEnd.tv_usec - userStart.tv_usec;
-    long algoSysTime = (sysEnd.tv_sec - sysStart.tv_sec) * 1000000 + sysEnd.tv_usec - sysStart.tv_usec;
+    // Escrever os resultados no arquivo de saída
+    writeKShortestPathsToFile(outputFile, result, k);
 
+    // Limpeza e saída
+    freeDijkstraResult(result);
     freeGraph(graph);
 
-    printf("Timing Information (Microseconds)\n");
-    printf("Reading Input: User Time: %ld, System Time: %ld\n", readUserTime, readSysTime);
-    printf("Algorithm Execution: User Time: %ld, System Time: %ld\n", algoUserTime, algoSysTime);
-
-    return 0;
+    return EXIT_SUCCESS;
 }

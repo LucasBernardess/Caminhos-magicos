@@ -1,0 +1,6 @@
+Caminho 1, custo: 0
+Path: 0 
+Caminho 2, custo: 2147483647
+Path: 
+Caminho 3, custo: 2147483647
+Path: 

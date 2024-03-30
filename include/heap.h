@@ -3,27 +3,24 @@
 
 #include <stdbool.h>
 
-// Estrutura para representar um nó na fila de prioridade
-typedef struct HeapNode {
-    int vertex; // O vértice do nó
-    int cost; // Custo para alcançar este vértice
+typedef struct {
+    int vertex; // O vértice do nó no heap
+    int dist;   // A chave ou distância do vértice do nó no heap
 } HeapNode;
 
-// Estrutura para representar a fila de prioridade (min heap)
-typedef struct MinHeap {
-    int size;     // Número atual de elementos no heap
-    int capacity; // Capacidade do heap
-    int *pos;     // Este array é usado para rastrear a posição dos elementos do heap
-    HeapNode **array;
+typedef struct {
+    int capacity; // Capacidade máxima do heap
+    int size;     // Número atual de nós no heap
+    HeapNode *nodes; // Array de nós do heap
+    int *pos;     // Esta array é necessário para a operação de decreaseKey
 } MinHeap;
 
-// Funções para manipulação da fila de prioridade
-MinHeap* createMinHeap(int capacity);
-void insertMinHeap(MinHeap* minHeap, int vertex, int cost);
-HeapNode* extractMin(MinHeap* minHeap);
-void decreaseKey(MinHeap* minHeap, int vertex, int cost);
-bool isEmpty(MinHeap* minHeap);
-bool isInMinHeap(MinHeap *minHeap, int vertex);
-void freeMinHeap(MinHeap* minHeap);
+// Protótipos das funções do heap mínimo
+MinHeap *createMinHeap(int capacity);
+void freeMinHeap(MinHeap *heap);
+void insertMinHeap(MinHeap *heap, int vertex, int dist);
+HeapNode extractMin(MinHeap *heap);
+void decreaseKey(MinHeap *heap, int vertex, int dist);
+bool isMinHeapEmpty(const MinHeap *heap);
 
-#endif
+#endif // HEAP_H

@@ -1,40 +1,75 @@
 #include "../include/graph.h"
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
-// Função para criar um grafo com um determinado número de vértices
-Graph* createGraph(int vertices) {
-    Graph* graph = (Graph*) malloc(sizeof(Graph));
-    graph->numVertices = vertices;
-    graph->adjLists = (Edge**) malloc(vertices * sizeof(Edge*));
+Graph *createGraph(int numVertices) {
+    Graph *graph = (Graph *)malloc(sizeof(Graph));
+    graph->numVertices = numVertices;
+    graph->vertices = (Vertex *)malloc(numVertices * sizeof(Vertex));
 
-    for (int i = 0; i < vertices; i++) {
-        graph->adjLists[i] = NULL;
+    for (int i = 0; i < numVertices; ++i) {
+        graph->vertices[i].head = NULL;
     }
 
     return graph;
 }
 
-// Função para adicionar uma aresta ao grafo
-void addEdge(Graph *graph, int src, int dest, int cost) {
-    // Adicionando aresta do src ao dest
-    Edge* newEdge = (Edge*) malloc(sizeof(Edge));
+void addEdge(Graph *graph, int src, int dest, int weight) {
+    Edge *newEdge = (Edge *)malloc(sizeof(Edge));
     newEdge->dest = dest;
-    newEdge->cost = cost;
-    newEdge->next = graph->adjLists[src];
-    graph->adjLists[src] = newEdge;
+    newEdge->weight = weight;
+    newEdge->next = graph->vertices[src].head;
+    graph->vertices[src].head = newEdge;
 }
 
-// Função para liberar a memória alocada para o grafo
 void freeGraph(Graph *graph) {
-    for (int i = 0; i < graph->numVertices; i++) {
-        Edge* edge = graph->adjLists[i];
-        while (edge != NULL) {
-            Edge* temp = edge;
+    if (graph == NULL) {
+        return;
+    }
+
+    for (int i = 0; i < graph->numVertices; ++i) {
+        Edge *edge = graph->vertices[i].head;
+        while (edge) {
+            Edge *tmp = edge;
             edge = edge->next;
-            free(temp);
+            free(tmp);
         }
     }
-    free(graph->adjLists);
+
+    free(graph->vertices);
     free(graph);
+}
+
+void printGraph(const Graph *graph) {
+    for (int i = 0; i < graph->numVertices; ++i) {
+        Edge *edge = graph->vertices[i].head;
+        printf("Vertex %d:\n", i);
+        while (edge) {
+            printf(" -> %d (weight %d)\n", edge->dest, edge->weight);
+            edge = edge->next;
+        }
+        printf("\n");
+    }
+}
+
+char *graphToString(const Graph *graph) {
+    char *str = malloc(1024 * sizeof(char)); // Assume um tamanho suficiente grande
+    char buffer[256];
+    strcpy(str, "");
+
+    for (int i = 0; i < graph->numVertices; ++i) {
+        Edge *edge = graph->vertices[i].head;
+        sprintf(buffer, "Vertex %d: ", i);
+        strcat(str, buffer);
+
+        while (edge) {
+            sprintf(buffer, " -> %d (weight %d)", edge->dest, edge->weight);
+            strcat(str, buffer);
+            edge = edge->next;
+        }
+        strcat(str, "\n");
+    }
+
+    return str; // Lembre-se de liberar essa string depois de usá-la!
 }
