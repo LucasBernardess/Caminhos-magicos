@@ -22,7 +22,7 @@ void lerGrafoEGravarSaida(char *arquivoEntrada, char *arquivoSaida) {
     // Após a leitura dos valores do arquivo de entrada
     printf("numCidades: %d\n", numCidades);
     printf("numVoos: %d\n", numVoos);
-    printf("k: %d\n", k);
+    printf("k: %d\n\n", k);
 
     // Cria o grafo com o número de vértices (cidades)
     Grafo *grafo = criarGrafo(numCidades);
@@ -40,7 +40,7 @@ void lerGrafoEGravarSaida(char *arquivoEntrada, char *arquivoSaida) {
     fclose(arquivoEntradaPtr);
 
     // Antes da chamada da função yen
-    printf("Cidade Origem: %d, Cidade Destino: %d, k: %d\n", cidadeOrigem, cidadeDestino, k);
+    printf("\nCidade Origem: %d, Cidade Destino: %d, k: %d\n\n", cidadeOrigem, cidadeDestino, k);
     // Chama o algoritmo de Yen para encontrar os k caminhos mais curtos
     MenorCaminho* caminhos = (MenorCaminho*)malloc(k * sizeof(MenorCaminho));
     caminhos = yen(grafo, cidadeOrigem - 1, cidadeDestino - 1, k);

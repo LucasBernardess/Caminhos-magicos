@@ -13,7 +13,7 @@ typedef struct {
     int noAnterior;
 } InfoCaminho;
 
-void relaxar(NoHeap* heap, int* tamHeap, InfoCaminho* caminhos, int src, int dest, int peso, int k);
+void relaxar(NoHeap* heap, int* tamHeap, InfoCaminho* caminhos, int src, int dest, int peso);
 int estaNoHeap(NoHeap* heap, int tamHeap, int no);
 void inserirNoHeap(NoHeap* heap, int* tamHeap, int no, int custo);
 NoHeap extrairMin(NoHeap* heap, int* tamHeap);

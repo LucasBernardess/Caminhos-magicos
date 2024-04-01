@@ -2,7 +2,7 @@
 #include "../include/yen.h"
 #include <stdio.h>
 
-void relaxar(NoHeap* heap, int* tamHeap, InfoCaminho* caminhos, int src, int dest, int peso, int k) {
+void relaxar(NoHeap* heap, int* tamHeap, InfoCaminho* caminhos, int src, int dest, int peso) {
     int novoCustoCaminho = caminhos[src].custo + peso;
 
     // Verificar se o novo caminho não é negativo
@@ -83,7 +83,7 @@ void dijkstra(Grafo* grafo, int origem, int k) {
 
         Aresta* arestaAtual = grafo->vertices[noAtual].proxima;
         while (arestaAtual != NULL) {
-            relaxar(heap, &tamHeap, caminhos, noAtual, arestaAtual->destino, arestaAtual->peso, k);
+            relaxar(heap, &tamHeap, caminhos, noAtual, arestaAtual->destino, arestaAtual->peso);
             arestaAtual = arestaAtual->proxima;
         }
 

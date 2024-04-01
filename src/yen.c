@@ -102,7 +102,6 @@ void liberarCaminhos(MenorCaminho* caminhos, int numCaminhos) {
 }
 
 // Função principal do algoritmo Yen
-// Função principal do algoritmo Yen
 MenorCaminho* yen(Grafo* grafo, int origem, int destino, int k) {
     MenorCaminho* caminhos = (MenorCaminho*)malloc(k * sizeof(MenorCaminho));
     Grafo grafoTemporario;
@@ -133,7 +132,7 @@ MenorCaminho* yen(Grafo* grafo, int origem, int destino, int k) {
                 printf(" -> ");
             }
         }
-        printf("\n");
+        printf("\n\n");
 
         // Remove a última aresta do caminho encontrado para encontrar o próximo caminho
         noAtual = origem;  // Manter esta declaração e inicialização
