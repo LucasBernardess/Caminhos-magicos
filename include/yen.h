@@ -16,5 +16,8 @@ void copiarGrafo(Grafo* grafoOrigem, Grafo* grafoDestino);
 MenorCaminho encontrarCaminho(Grafo* grafo, int origem, int destino);
 void modificarGrafo(Grafo* grafo, MenorCaminho caminho);
 void liberarCaminhos(MenorCaminho* caminhos, int numCaminhos);
+int caminhoJaEncontrado(MenorCaminho* caminhos, int numeroCaminhos, MenorCaminho caminho);
+int compararCaminhos(MenorCaminho* caminho1, MenorCaminho* caminho2);
+void liberarCaminho(MenorCaminho* caminho);
 
 #endif
