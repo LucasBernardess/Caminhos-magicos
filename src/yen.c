@@ -205,17 +205,16 @@ MenorCaminho *yen(Grafo *grafo, int origem, int destino, int k)
             continue;
         }
 
-        printf("Custo encontrado para o caminho %d: %d\n", i + 1, caminhos[i].custo);
-        printf("Caminho %d encontrado: ", i + 1);
-        for (int j = 0; j < caminhos[i].comprimentoCaminho; j++)
-        {
-            printf("%d", caminhos[i].caminho[j] + 1); // +1 para ajustar a impressão conforme a numeração das cidades
-            if (j < caminhos[i].comprimentoCaminho - 1)
-            {
-                printf(" -> ");
-            }
-        }
-        printf("\n\n");
+        // Dentro do loop do algoritmo de Yen, após encontrar um caminho
+printf("Caminho %d encontrado: ", i + 1);
+for (int j = 0; j < caminhos[i].comprimentoCaminho; j++) {
+    printf("%d", caminhos[i].caminho[j] + 1); // Ajustar para começar da origem
+    if (j < caminhos[i].comprimentoCaminho - 1) {
+        printf(" -> ");
+    }
+}
+printf("\n");
+
 
         restaurarGrafo(grafo, &grafoTemp);   // Restaurar o grafo para o estado original
         modificarGrafo(&grafoTemp, caminho); // Modificar o grafo para a próxima busca
