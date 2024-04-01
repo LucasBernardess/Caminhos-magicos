@@ -130,8 +130,9 @@ MenorCaminho encontrarCaminho(Grafo *grafo, int origem, int destino)
 
     // Estimar o tamanho do caminho (isso pode ser ajustado conforme necessário)
     caminho.caminho = (int *)malloc(grafo->numVertices * sizeof(int));
-
     int atual = destino;
+
+    // Construir o caminho de trás para frente, do destino para a origem
     while (atual != origem)
     {
         caminho.caminho[caminho.comprimentoCaminho++] = atual;
@@ -139,7 +140,7 @@ MenorCaminho encontrarCaminho(Grafo *grafo, int origem, int destino)
     }
     caminho.caminho[caminho.comprimentoCaminho++] = origem;
 
-    // Opcional: Inverter o caminho se necessário para que comece na origem e termine no destino
+    // Inverter o caminho para que comece na origem e termine no destino
     for (int i = 0; i < caminho.comprimentoCaminho / 2; i++)
     {
         int temp = caminho.caminho[i];
@@ -206,9 +207,11 @@ MenorCaminho *yen(Grafo *grafo, int origem, int destino, int k)
 
         printf("Custo encontrado para o caminho %d: %d\n", i + 1, caminhos[i].custo);
         printf("Caminho %d encontrado: ", i + 1);
-        for (int j = caminhos[i].comprimentoCaminho - 1; j >= 0; j--) {
-            printf("%d", caminhos[i].caminho[j]);
-            if (j > 0) {
+        for (int j = 0; j < caminhos[i].comprimentoCaminho; j++)
+        {
+            printf("%d", caminhos[i].caminho[j] + 1); // +1 para ajustar a impressão conforme a numeração das cidades
+            if (j < caminhos[i].comprimentoCaminho - 1)
+            {
                 printf(" -> ");
             }
         }
@@ -223,34 +226,29 @@ MenorCaminho *yen(Grafo *grafo, int origem, int destino, int k)
 }
 
 // Função para verificar se o caminho já foi encontrado
-int caminhoJaEncontrado(MenorCaminho *caminhos, int numeroCaminhos, MenorCaminho caminho)
-{
-    for (int i = 0; i < numeroCaminhos; i++)
-    {
-        if (compararCaminhos(&caminhos[i], &caminho))
-        {
+int caminhoJaEncontrado(MenorCaminho* caminhos, int numeroCaminhos, MenorCaminho novoCaminho) {
+    for (int i = 0; i < numeroCaminhos; i++) {
+        if (caminhos[i].custo == novoCaminho.custo && compararCaminhos(&caminhos[i], &novoCaminho)) {
             return 1;
         }
     }
     return 0;
 }
 
+
 // Função para comparar dois caminhos (deve ser implementada corretamente)
 int compararCaminhos(MenorCaminho* caminho1, MenorCaminho* caminho2) {
-    // Se os caminhos tiverem comprimentos diferentes, eles não são iguais
     if (caminho1->comprimentoCaminho != caminho2->comprimentoCaminho) {
-        return 0;
+        return 0; // Os caminhos têm comprimentos diferentes e, portanto, são diferentes
     }
     
-    // Compare cada nó nos caminhos
     for (int i = 0; i < caminho1->comprimentoCaminho; i++) {
         if (caminho1->caminho[i] != caminho2->caminho[i]) {
-            return 0; // Os caminhos são diferentes
+            return 0; // Encontrou um nó diferente nos caminhos
         }
     }
     
-    // Se todos os nós são iguais, os caminhos são iguais
-    return 1;
+    return 1; // Os caminhos são iguais
 }
 
 // Função para liberar os recursos do caminho
