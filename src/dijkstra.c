@@ -63,7 +63,7 @@ void heapMinimo(NoHeap* heap, int i, int tamHeap) {
     }
 }
 
-void dijkstra(Grafo* grafo, int origem, int k) {
+void dijkstra(Grafo* grafo, int origem) {
     int numVertices = grafo->numVertices;
     InfoCaminho* caminhos = (InfoCaminho*)malloc(numVertices * sizeof(InfoCaminho));
     NoHeap* heap = (NoHeap*)malloc(numVertices * sizeof(NoHeap));
@@ -77,7 +77,7 @@ void dijkstra(Grafo* grafo, int origem, int k) {
     caminhos[origem].custo = 0;
     inserirNoHeap(heap, &tamHeap, origem, 0);
 
-    while (tamHeap > 0 && k > 0) {
+    while (tamHeap > 0) {
         NoHeap minNo = extrairMin(heap, &tamHeap);
         int noAtual = minNo.no;
 
@@ -86,8 +86,6 @@ void dijkstra(Grafo* grafo, int origem, int k) {
             relaxar(heap, &tamHeap, caminhos, noAtual, arestaAtual->destino, arestaAtual->peso);
             arestaAtual = arestaAtual->proxima;
         }
-
-        k--;
     }
 
     // Atualização do grafo com os resultados de Dijkstra
