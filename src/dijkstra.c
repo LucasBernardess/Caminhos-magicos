@@ -1,92 +1,106 @@
 #include "../include/dijkstra.h"
-#include <stdlib.h>
+#include "../include/yen.h"
 #include <stdio.h>
-#include <string.h>
-#include <limits.h>
 
-DijkstraResult *dijkstra(const Graph *graph, int src, int k) {
-    // Código para a implementação simplificada do algoritmo de Dijkstra
-    // Esta implementação não encontra k caminhos, mas pode ser um ponto de partida
+void relaxar(NoHeap* heap, int* tamHeap, InfoCaminho* caminhos, int src, int dest, int peso, int k) {
+    int novoCustoCaminho = caminhos[src].custo + peso;
 
-    // Inicialização do resultado do Dijkstra
-    DijkstraResult *result = (DijkstraResult *)malloc(sizeof(DijkstraResult));
-    result->numPaths = graph->numVertices;
-    result->paths = (Path *)malloc(graph->numVertices * sizeof(Path));
+    // Verificar se o novo caminho não é negativo
+    if (novoCustoCaminho >= 0) {
+        // Se o novo caminho for mais curto, atualiza o custo mínimo e o nó anterior
+        if (novoCustoCaminho < caminhos[dest].custo || caminhos[dest].custo == -1) {
+            caminhos[dest].custo = novoCustoCaminho;
+            caminhos[dest].noAnterior = src;
 
-    // Inicializar todos os custos para infinito e os caminhos para NULL
-    for (int i = 0; i < graph->numVertices; i++) {
-        result->paths[i].cost = INT_MAX;
-        result->paths[i].path = (int *)malloc(graph->numVertices * sizeof(int));
-        result->paths[i].length = 0;
-    }
-
-    // O custo do caminho da origem para ele mesmo é sempre 0
-    result->paths[src].cost = 0;
-    result->paths[src].path[0] = src;
-    result->paths[src].length = 1;
-
-    // Array para manter o controle dos vértices para os quais o menor custo já foi encontrado
-    int *minPathFound = (int *)calloc(graph->numVertices, sizeof(int));
-
-    // Estrutura de heap mínimo para escolher o vértice com o menor custo de caminho
-    MinHeap *heap = createMinHeap(graph->numVertices);
-    for (int i = 0; i < graph->numVertices; i++) {
-        if (i != src) {
-            insertMinHeap(heap, i, INT_MAX);
-        } else {
-            insertMinHeap(heap, i, 0); // A distância da origem para ela mesma é zero
-        }
-    }
-
-    // Algoritmo de Dijkstra
-    while (!isMinHeapEmpty(heap)) {
-        // Extrai o vértice com o menor custo de caminho
-        HeapNode currentNode = extractMin(heap);
-        int u = currentNode.vertex;
-        minPathFound[u] = 1;
-
-        // Atualiza o custo para todos os vértices adjacentes a u
-        Edge *adjList = graph->vertices[u].head;
-        while (adjList != NULL) {
-            int v = adjList->dest;
-            if (!minPathFound[v] && result->paths[u].cost != INT_MAX &&
-                result->paths[u].cost + adjList->weight < result->paths[v].cost) {
-                // Encontrou um caminho mais curto para o vértice adjacente
-                result->paths[v].cost = result->paths[u].cost + adjList->weight;
-                
-                // Copiar o caminho de u e adicionar v
-                memcpy(result->paths[v].path, result->paths[u].path, result->paths[u].length * sizeof(int));
-                result->paths[v].length = result->paths[u].length;
-                result->paths[v].path[result->paths[v].length++] = v;
-
-                // Atualiza a distância no heap
-                decreaseKey(heap, v, result->paths[v].cost);
+            // Inserir o nó na heap se ainda não estiver lá
+            if (!estaNoHeap(heap, *tamHeap, dest)) {
+                inserirNoHeap(heap, tamHeap, dest, novoCustoCaminho);
             }
-            adjList = adjList->next;
         }
-    }
-
-    free(minPathFound);
-    freeMinHeap(heap);
-    return result;
-}
-
-void freeDijkstraResult(DijkstraResult *result) {
-    if (result) {
-        for (int i = 0; i < result->capacity; ++i) {
-            free(result->paths[i].path);
-        }
-        free(result->paths);
-        free(result);
     }
 }
 
-void printDijkstraResult(const DijkstraResult *result) {
-    for (int i = 0; i < result->numPaths; ++i) {
-        printf("Path %d, cost: %d, vertices: ", i + 1, result->paths[i].cost);
-        for (int j = 0; j < result->paths[i].length; ++j) {
-            printf("%d ", result->paths[i].path[j]);
+int estaNoHeap(NoHeap* heap, int tamHeap, int no) {
+    for (int i = 0; i < tamHeap; i++) {
+        if (heap[i].no == no) {
+            return 1;
         }
-        printf("\n");
     }
+    return 0;
+}
+
+void inserirNoHeap(NoHeap* heap, int* tamHeap, int no, int custo) {
+    heap[*tamHeap].no = no;
+    heap[*tamHeap].custo = custo;
+    (*tamHeap)++;
+}
+
+NoHeap extrairMin(NoHeap* heap, int* tamHeap) {
+    NoHeap min = heap[0];
+    heap[0] = heap[*tamHeap - 1];
+    (*tamHeap)--;
+    heapMinimo(heap, 0, *tamHeap);
+    return min;
+}
+
+void heapMinimo(NoHeap* heap, int i, int tamHeap) {
+    int menor = i;
+    int esquerda = 2 * i + 1;
+    int direita = 2 * i + 2;
+
+    if (esquerda < tamHeap && heap[esquerda].custo < heap[menor].custo) {
+        menor = esquerda;
+    }
+    if (direita < tamHeap && heap[direita].custo < heap[menor].custo) {
+        menor = direita;
+    }
+
+    if (menor != i) {
+        NoHeap temp = heap[i];
+        heap[i] = heap[menor];
+        heap[menor] = temp;
+        heapMinimo(heap, menor, tamHeap);
+    }
+}
+
+void dijkstra(Grafo* grafo, int origem, int k) {
+    int numVertices = grafo->numVertices;
+    InfoCaminho* caminhos = (InfoCaminho*)malloc(numVertices * sizeof(InfoCaminho));
+    NoHeap* heap = (NoHeap*)malloc(numVertices * sizeof(NoHeap));
+    int tamHeap = 0;
+
+    for (int i = 0; i < numVertices; i++) {
+        caminhos[i].custo = -1;
+        caminhos[i].noAnterior = -1;
+    }
+
+    caminhos[origem].custo = 0;
+    inserirNoHeap(heap, &tamHeap, origem, 0);
+
+    while (tamHeap > 0 && k > 0) {
+        NoHeap minNo = extrairMin(heap, &tamHeap);
+        int noAtual = minNo.no;
+
+        Aresta* arestaAtual = grafo->vertices[noAtual].proxima;
+        while (arestaAtual != NULL) {
+            relaxar(heap, &tamHeap, caminhos, noAtual, arestaAtual->destino, arestaAtual->peso, k);
+            arestaAtual = arestaAtual->proxima;
+        }
+
+        k--;
+    }
+
+    // Atualização do grafo com os resultados de Dijkstra
+    for (int i = 0; i < numVertices; i++) {
+        grafo->vertices[i].custo = caminhos[i].custo;
+        grafo->vertices[i].noAnterior = caminhos[i].noAnterior;
+    }
+
+    // Adicione instruções de impressão para depurar o resultado do Dijkstra
+    for (int i = 0; i < numVertices; i++) {
+        printf("Custo mínimo de %d para %d: %d\n", origem, i, caminhos[i].custo);
+    }
+
+    free(caminhos);
+    free(heap);
 }

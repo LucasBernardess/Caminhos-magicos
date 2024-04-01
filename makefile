@@ -1,13 +1,25 @@
-CC=gcc
-CFLAGS=-Iinclude
-DEPS = include/dijkstra.h include/file_io.h include/graph.h include/heap.h
-OBJ = src/dijkstra.o src/file_io.o src/graph.o src/heap.o src/main.o
+CC = gcc
+CFLAGS = -Wall -Wextra -g
 
-%.o: %.c $(DEPS)
-	$(CC) -c -o $@ $< $(CFLAGS)
+all: main
 
-project: $(OBJ)
-	$(CC) -o $@ $^ $(CFLAGS)
+main: src/main.o src/leitura_arquivo.o src/grafo.o src/dijkstra.o src/yen.o
+	$(CC) $(CFLAGS) -o main src/main.o src/leitura_arquivo.o src/grafo.o src/dijkstra.o src/yen.o
+
+main.o: src/main.c include/leitura_arquivo.h include/grafo.h include/dijkstra.h include/yen.h
+	$(CC) $(CFLAGS) -c src/main.c
+
+leitura_arquivo.o: src/leitura_arquivo.c include/leitura_arquivo.h include/grafo.h include/dijkstra.h include/yen.h
+	$(CC) $(CFLAGS) -c src/leitura_arquivo.c
+
+grafo.o: src/grafo.c include/grafo.h
+	$(CC) $(CFLAGS) -c src/grafo.c
+
+dijkstra.o: src/dijkstra.c include/dijkstra.h
+	$(CC) $(CFLAGS) -c src/dijkstra.c
+
+yen.o: src/yen.c include/yen.h include/dijkstra.h include/grafo.h
+	$(CC) $(CFLAGS) -c src/yen.c
 
 clean:
-	rm -f src/*.o project
+	rm -f main *.o

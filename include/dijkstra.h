@@ -1,31 +1,23 @@
 #ifndef DIJKSTRA_H
 #define DIJKSTRA_H
 
-#include "graph.h"
-#include "heap.h"
+#include "grafo.h"
 
-// Structure to store an individual path and its total cost
 typedef struct {
-    int cost;       // The total cost of the path
-    int *path;      // The array of vertices that form the path
-    int length;     // The number of vertices in the path
-    int capacity;   // The capacity of the path array
-} Path;
+    int no;
+    int custo;
+} NoHeap;
 
-// Structure to store the results of a path search
 typedef struct {
-    Path *paths;    // An array of paths
-    int numPaths;   // The number of paths found
-    int capacity;   // The capacity of the paths array
-} DijkstraResult;
+    int custo;
+    int noAnterior;
+} InfoCaminho;
 
-// Function to execute the Dijkstra algorithm
-DijkstraResult *dijkstra(const Graph *graph, int src, int k);
+void relaxar(NoHeap* heap, int* tamHeap, InfoCaminho* caminhos, int src, int dest, int peso, int k);
+int estaNoHeap(NoHeap* heap, int tamHeap, int no);
+void inserirNoHeap(NoHeap* heap, int* tamHeap, int no, int custo);
+NoHeap extrairMin(NoHeap* heap, int* tamHeap);
+void heapMinimo(NoHeap* heap, int i, int tamHeap);
+void dijkstra(Grafo* grafo, int origem, int k);
 
-// Function to free the memory allocated for the Dijkstra result
-void freeDijkstraResult(DijkstraResult *result);
-
-// Function to print the Dijkstra result
-void printDijkstraResult(const DijkstraResult *result);
-
-#endif // DIJKSTRA_H
+#endif
