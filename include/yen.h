@@ -4,9 +4,9 @@
 #include "dijkstra.h"
 
 typedef struct {
-    int* caminho;
-    int custo;
-    int comprimentoCaminho;  // Adicionando o membro comprimentoCaminho para armazenar o comprimento do caminho
+    int* caminho;                 // Array para armazenar os nós do caminho
+    int custo;                    // Custo total do caminho
+    int comprimentoCaminho;       // Quantidade de nós no caminho
 } MenorCaminho;
 
 MenorCaminho* yen(Grafo* grafo, int origem, int destino, int k);

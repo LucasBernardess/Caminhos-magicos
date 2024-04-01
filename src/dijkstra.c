@@ -1,50 +1,22 @@
+// dijkstra.c
 #include "../include/dijkstra.h"
-#include "../include/yen.h"
 #include <limits.h>
-#include <stdio.h>
+#include <stdbool.h>
+#include <stdlib.h>
 
-void relaxar(NoHeap* heap, int* tamHeap, InfoCaminho* caminhos, int src, int dest, int peso) {
-    int novoCustoCaminho = caminhos[src].custo + peso;
-
-    // Verificar se o novo caminho não é negativo
-    if (novoCustoCaminho >= 0) {
-        // Se o novo caminho for mais curto, atualiza o custo mínimo e o nó anterior
-        if (novoCustoCaminho < caminhos[dest].custo || caminhos[dest].custo == -1) {
-            caminhos[dest].custo = novoCustoCaminho;
-            caminhos[dest].noAnterior = src;
-
-            // Inserir o nó na heap se ainda não estiver lá
-            if (!estaNoHeap(heap, *tamHeap, dest)) {
-                inserirNoHeap(heap, tamHeap, dest, novoCustoCaminho);
-            }
-        }
+// Função auxiliar para inserir um nó na heap
+static void inserirNoHeap(NoHeap* heap, int* tamHeap, int no, int custo) {
+    int i = (*tamHeap)++;
+    while (i && custo < heap[(i - 1) / 2].custo) {
+        heap[i] = heap[(i - 1) / 2];
+        i = (i - 1) / 2;
     }
+    heap[i].no = no;
+    heap[i].custo = custo;
 }
 
-int estaNoHeap(NoHeap* heap, int tamHeap, int no) {
-    for (int i = 0; i < tamHeap; i++) {
-        if (heap[i].no == no) {
-            return 1;
-        }
-    }
-    return 0;
-}
-
-void inserirNoHeap(NoHeap* heap, int* tamHeap, int no, int custo) {
-    heap[*tamHeap].no = no;
-    heap[*tamHeap].custo = custo;
-    (*tamHeap)++;
-}
-
-NoHeap extrairMin(NoHeap* heap, int* tamHeap) {
-    NoHeap min = heap[0];
-    heap[0] = heap[*tamHeap - 1];
-    (*tamHeap)--;
-    heapMinimo(heap, 0, *tamHeap);
-    return min;
-}
-
-void heapMinimo(NoHeap* heap, int i, int tamHeap) {
+// Função auxiliar para corrigir a heap para baixo a partir de um índice
+static void heapMinimo(NoHeap* heap, int tamHeap, int i) {
     int menor = i;
     int esquerda = 2 * i + 1;
     int direita = 2 * i + 2;
@@ -55,54 +27,73 @@ void heapMinimo(NoHeap* heap, int i, int tamHeap) {
     if (direita < tamHeap && heap[direita].custo < heap[menor].custo) {
         menor = direita;
     }
-
     if (menor != i) {
         NoHeap temp = heap[i];
         heap[i] = heap[menor];
         heap[menor] = temp;
-        heapMinimo(heap, menor, tamHeap);
+        heapMinimo(heap, tamHeap, menor);
     }
 }
 
+// Função auxiliar para extrair o nó com o menor custo da heap
+static NoHeap extrairMin(NoHeap* heap, int* tamHeap) {
+    NoHeap min = heap[0];
+    heap[0] = heap[--(*tamHeap)];
+    heapMinimo(heap, *tamHeap, 0);
+    return min;
+}
+
+// A função relaxar é usada para atualizar o custo de um caminho para um determinado nó
+static void relaxar(NoHeap* heap, int* tamHeap, InfoCaminho* caminhos, int src, int dest, int peso) {
+    int novoCusto = caminhos[src].custo + peso;
+    if (novoCusto < caminhos[dest].custo) {
+        caminhos[dest].custo = novoCusto;
+        caminhos[dest].noAnterior = src;
+        inserirNoHeap(heap, tamHeap, dest, novoCusto);
+    }
+}
+
+// Implementação do algoritmo de Dijkstra
 void dijkstra(Grafo* grafo, int origem) {
     int numVertices = grafo->numVertices;
     InfoCaminho* caminhos = (InfoCaminho*)malloc(numVertices * sizeof(InfoCaminho));
     NoHeap* heap = (NoHeap*)malloc(numVertices * sizeof(NoHeap));
+    bool* visitados = (bool*)calloc(numVertices, sizeof(bool));
     int tamHeap = 0;
 
+    // Inicializa as estruturas de caminhos e heap
     for (int i = 0; i < numVertices; i++) {
         caminhos[i].custo = INT_MAX;
         caminhos[i].noAnterior = -1;
     }
-
     caminhos[origem].custo = 0;
     inserirNoHeap(heap, &tamHeap, origem, 0);
 
-   while (tamHeap > 0) {
+    // Executa o algoritmo de Dijkstra
+    while (tamHeap > 0) {
         NoHeap minNo = extrairMin(heap, &tamHeap);
-        int noAtual = minNo.no;
+        int u = minNo.no;
 
-        // Verificar se já foi relaxado antes de processar as arestas
-        if (caminhos[noAtual].custo == minNo.custo) {
-            Aresta* arestaAtual = grafo->vertices[noAtual].proxima;
-            while (arestaAtual != NULL) {
-                relaxar(heap, &tamHeap, caminhos, noAtual, arestaAtual->destino, arestaAtual->peso);
-                arestaAtual = arestaAtual->proxima;
+        // Se já foi visitado, pule
+        if (visitados[u]) continue;
+        visitados[u] = true;
+
+        // Processa os vizinhos do nó u
+        for (Aresta* e = grafo->vertices[u].proxima; e != NULL; e = e->proxima) {
+            if (!visitados[e->destino]) {
+                relaxar(heap, &tamHeap, caminhos, u, e->destino, e->peso);
             }
         }
     }
 
-    // Atualização do grafo com os resultados de Dijkstra
+    // Atualiza o grafo com os resultados de Dijkstra
     for (int i = 0; i < numVertices; i++) {
         grafo->vertices[i].custo = caminhos[i].custo;
         grafo->vertices[i].noAnterior = caminhos[i].noAnterior;
     }
 
-    // Adicione instruções de impressão para depurar o resultado do Dijkstra
-    for (int i = 0; i < numVertices; i++) {
-        printf("Custo mínimo de %d para %d: %d\n", origem, i, caminhos[i].custo);
-    }
-
+    // Libera a memória alocada
     free(caminhos);
     free(heap);
+    free(visitados);
 }
