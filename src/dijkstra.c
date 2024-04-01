@@ -1,5 +1,6 @@
 #include "../include/dijkstra.h"
 #include "../include/yen.h"
+#include <limits.h>
 #include <stdio.h>
 
 void relaxar(NoHeap* heap, int* tamHeap, InfoCaminho* caminhos, int src, int dest, int peso) {
@@ -70,21 +71,24 @@ void dijkstra(Grafo* grafo, int origem) {
     int tamHeap = 0;
 
     for (int i = 0; i < numVertices; i++) {
-        caminhos[i].custo = -1;
+        caminhos[i].custo = INT_MAX;
         caminhos[i].noAnterior = -1;
     }
 
     caminhos[origem].custo = 0;
     inserirNoHeap(heap, &tamHeap, origem, 0);
 
-    while (tamHeap > 0) {
+   while (tamHeap > 0) {
         NoHeap minNo = extrairMin(heap, &tamHeap);
         int noAtual = minNo.no;
 
-        Aresta* arestaAtual = grafo->vertices[noAtual].proxima;
-        while (arestaAtual != NULL) {
-            relaxar(heap, &tamHeap, caminhos, noAtual, arestaAtual->destino, arestaAtual->peso);
-            arestaAtual = arestaAtual->proxima;
+        // Verificar se já foi relaxado antes de processar as arestas
+        if (caminhos[noAtual].custo == minNo.custo) {
+            Aresta* arestaAtual = grafo->vertices[noAtual].proxima;
+            while (arestaAtual != NULL) {
+                relaxar(heap, &tamHeap, caminhos, noAtual, arestaAtual->destino, arestaAtual->peso);
+                arestaAtual = arestaAtual->proxima;
+            }
         }
     }
 
