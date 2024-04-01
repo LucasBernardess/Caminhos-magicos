@@ -122,51 +122,6 @@ void liberarCaminhos(MenorCaminho *caminhos, int numCaminhos)
     free(caminhos);
 }
 
-// // Função principal do algoritmo Yen
-// MenorCaminho* yen(Grafo* grafo, int origem, int destino, int k) {
-//     MenorCaminho* caminhos = (MenorCaminho*)malloc(k * sizeof(MenorCaminho));
-//     Grafo grafoTemporario;
-//     copiarGrafo(grafo, &grafoTemporario);  // Copia o grafo original para o grafo temporário
-
-//     for (int i = 0; i < k; i++) {
-//         // Encontra o caminho mais curto do source para o target no grafo temporário
-//         dijkstra(&grafoTemporario, origem, destino);
-
-//         // Armazena o custo e o caminho no array de caminhos
-//         caminhos[i].custo = grafoTemporario.vertices[destino].custo;
-//         caminhos[i].caminho = (int*)malloc(grafoTemporario.numVertices * sizeof(int));
-//         caminhos[i].comprimentoCaminho = 0;
-//         int noAtual = destino;
-//         int indiceCaminho = 0;
-//         while (noAtual != origem) {
-//             caminhos[i].caminho[indiceCaminho++] = noAtual;
-//             noAtual = grafoTemporario.vertices[noAtual].noAnterior;  // Move para o predecessor
-//         }
-//         caminhos[i].caminho[indiceCaminho++] = origem;  // Adiciona o nó de origem ao caminho
-//         caminhos[i].comprimentoCaminho = indiceCaminho;  // Salva o comprimento do caminho
-
-//         printf("Custo encontrado para o caminho %d: %d\n", i + 1, caminhos[i].custo);
-//         printf("Caminho %d encontrado: ", i + 1);
-//         for (int j = caminhos[i].comprimentoCaminho - 1; j >= 0; j--) {
-//             printf("%d", caminhos[i].caminho[j]);
-//             if (j > 0) {
-//                 printf(" -> ");
-//             }
-//         }
-//         printf("\n\n");
-
-//         // Remove a última aresta do caminho encontrado para encontrar o próximo caminho
-//         noAtual = origem;  // Manter esta declaração e inicialização
-//         for (int j = 0; j < caminhos[i].comprimentoCaminho - 1; j++) {
-//             int proximoNo = caminhos[i].caminho[j];
-//             removerAresta(&grafoTemporario, noAtual, proximoNo);
-//             noAtual = proximoNo;
-//         }
-//     }
-
-//     return caminhos;
-// }
-
 MenorCaminho encontrarCaminho(Grafo *grafo, int origem, int destino)
 {
     MenorCaminho caminho;
@@ -248,6 +203,16 @@ MenorCaminho *yen(Grafo *grafo, int origem, int destino, int k)
             i--;                      // Decrementar o índice para tentar encontrar outro caminho
             continue;
         }
+
+        printf("Custo encontrado para o caminho %d: %d\n", i + 1, caminhos[i].custo);
+        printf("Caminho %d encontrado: ", i + 1);
+        for (int j = caminhos[i].comprimentoCaminho - 1; j >= 0; j--) {
+            printf("%d", caminhos[i].caminho[j]);
+            if (j > 0) {
+                printf(" -> ");
+            }
+        }
+        printf("\n\n");
 
         restaurarGrafo(grafo, &grafoTemp);   // Restaurar o grafo para o estado original
         modificarGrafo(&grafoTemp, caminho); // Modificar o grafo para a próxima busca
