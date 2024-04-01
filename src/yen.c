@@ -198,10 +198,20 @@ MenorCaminho* yen(Grafo* grafo, int origem, int destino, int k) {
     for (int i = 0; i < k; i++) {
         dijkstra(&grafoTemp, origem);
         caminhos[i] = encontrarCaminho(&grafoTemp, origem, destino);
+        
+        // Adicione uma verificação aqui para assegurar que o caminho é válido.
+        if (caminhos[i].custo == -1) {
+            // Se o custo é -1, não há caminho. Pule para o próximo caminho.
+            continue;
+        }
+        
         modificarGrafo(&grafoTemp, caminhos[i]);
+        
+        
+        // Restaure o grafo para a próxima iteração.
+        restaurarGrafo(grafo, &grafoTemp);
     }
 
     // Restaurar grafoTemp para o estado original se necessário
-    liberarGrafo(&grafoTemp);
     return caminhos;
 }
