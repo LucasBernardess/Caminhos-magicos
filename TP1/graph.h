@@ -8,29 +8,30 @@
 
 // Estrutura de uma aresta do grafo
 typedef struct Edge {
-    int destino;
-    int peso;
+    unsigned long int destino; 
+    unsigned long int peso; 
     struct Edge* proxima;
 } Edge;
 
 // Estrutura de um vértice do grafo
 typedef struct Vertex {
-    int id;
+    unsigned long int id;
     Edge* proxima;
-    int custo;
-    int noAnterior;
+    unsigned long int custo;
+    unsigned long int noAnterior;
 } Vertex;
 
 // Estrutura do grafo
 typedef struct Graph {
-    int numVertices;
-    Vertex* vertices;
+    unsigned long int numVertices; // Usa unsigned long int para o número de vértices
+    Vertex* vertices; // Array de vértices
 } Graph;
 
-Graph* criarGrafo(int numVertices);
-void adicionarAresta(Graph* grafo, int origem, int destino, int peso);
+// Declarações de funções
+Graph* criarGrafo(unsigned long int numVertices);
+void adicionarAresta(Graph* grafo, unsigned long int origem, unsigned long int destino, unsigned long int peso);
 void liberarGrafo(Graph* grafo);
-void removerAresta(Graph *grafo, int src, int dest);
+void removerAresta(Graph *grafo, unsigned long int origem, unsigned long int destino);
 void copiarGrafo(Graph* grafoOrigem, Graph* grafoDestino);
 void imprimirGrafo(Graph* grafo);
 

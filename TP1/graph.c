@@ -1,12 +1,12 @@
 #include "graph.h"
 
 // Função para criar um novo grafo
-Graph* criarGrafo(int numVertices) {
+Graph* criarGrafo(unsigned long int numVertices) {
     Graph* grafo = (Graph*)malloc(sizeof(Graph));
     grafo->numVertices = numVertices;
     grafo->vertices = (Vertex*)malloc(numVertices * sizeof(Vertex));
 
-    for (int i = 0; i < numVertices; i++) {
+    for (unsigned long int i = 0; i < numVertices; i++) {
         grafo->vertices[i].id = i;
         grafo->vertices[i].proxima = NULL;
     }
@@ -15,7 +15,7 @@ Graph* criarGrafo(int numVertices) {
 }
 
 // Função para adicionar uma aresta ao grafo
-void adicionarAresta(Graph* grafo, int origem, int destino, int peso) {
+void adicionarAresta(Graph* grafo, unsigned long int origem, unsigned long int destino, unsigned long int peso) {
     Edge* novaAresta = (Edge*)malloc(sizeof(Edge));
     novaAresta->destino = destino;
     novaAresta->peso = peso;
@@ -23,52 +23,31 @@ void adicionarAresta(Graph* grafo, int origem, int destino, int peso) {
     grafo->vertices[origem].proxima = novaAresta;
 }
 
-// Função para gerar o arquivo DOT para o Graphviz
-void gerarArquivoDot(Graph* grafo) {
-    FILE* arquivoDot = fopen("grafo.dot", "w");
-
-    if (arquivoDot == NULL) {
-        printf("Erro ao criar o arquivo DOT.\n");
-        return;
-    }
-
-    fprintf(arquivoDot, "digraph G {\n");
-
-    for (int i = 0; i < grafo->numVertices; i++) {
-        Edge* arestaAtual = grafo->vertices[i].proxima;
-        while (arestaAtual != NULL) {
-            fprintf(arquivoDot, "\t%d -> %d [label=\"%d\"];\n", i + 1, arestaAtual->destino + 1, arestaAtual->peso);
-            arestaAtual = arestaAtual->proxima;
-        }
-    }
-    system("dot -Tpng grafo.dot -o grafo.png");
-    fprintf(arquivoDot, "}\n");
-    fclose(arquivoDot);
-}
-
+// Função para liberar toda a memória alocada para o grafo
 void liberarGrafo(Graph* grafo) {
     if (grafo == NULL) return;
 
-    for (int i = 0; i < grafo->numVertices; i++) {
-        Edge* aresta = grafo->vertices[i].proxima;
-        while (aresta != NULL) {
-            Edge* tmp = aresta;
-            aresta = aresta->proxima;
-            free(tmp); // Libera cada aresta individualmente
+    for (unsigned long int i = 0; i < grafo->numVertices; i++) {
+        Edge* arestaAtual = grafo->vertices[i].proxima;
+        while (arestaAtual != NULL) {
+            Edge* tmp = arestaAtual;
+            arestaAtual = arestaAtual->proxima;
+            free(tmp);
         }
     }
-    free(grafo->vertices); // Libera o array de vértices
-    free(grafo); // Libera o grafo
+    free(grafo->vertices);
+    free(grafo);
 }
 
-void removerAresta(Graph* grafo, int origem, int destino) {
+// Função para remover uma aresta do grafo
+void removerAresta(Graph* grafo, unsigned long int origem, unsigned long int destino) {
     Edge **ptr = &(grafo->vertices[origem].proxima), *temp;
     while (*ptr != NULL) {
         if ((*ptr)->destino == destino) {
             temp = *ptr;
             *ptr = (*ptr)->proxima;
-            free(temp); // Libera a aresta removida corretamente
-            break; // Para a execução após remover a aresta
+            free(temp);
+            break;
         }
         ptr = &((*ptr)->proxima);
     }
@@ -77,7 +56,7 @@ void removerAresta(Graph* grafo, int origem, int destino) {
 void copiarGrafo(Graph* origem, Graph* destino) {
     // Certifica-se de que a memória atualmente alocada para destino->vertices seja liberada, se existir
     if (destino->vertices != NULL) {
-        for (int i = 0; i < destino->numVertices; i++) {
+        for (unsigned long int i = 0; i < destino->numVertices; i++) {
             Edge* atual = destino->vertices[i].proxima;
             while (atual != NULL) {
                 Edge* paraRemover = atual;
@@ -96,7 +75,7 @@ void copiarGrafo(Graph* origem, Graph* destino) {
         exit(EXIT_FAILURE);
     }
 
-    for (int i = 0; i < origem->numVertices; i++) {
+    for (unsigned long int i = 0; i < origem->numVertices; i++) {
         destino->vertices[i].proxima = NULL;
         Edge* atual = origem->vertices[i].proxima;
         Edge** ptrDestino = &(destino->vertices[i].proxima);
@@ -117,15 +96,13 @@ void copiarGrafo(Graph* origem, Graph* destino) {
     }
 }
 
+// Função para imprimir o grafo (para depuração)
 void imprimirGrafo(Graph* grafo) {
-    printf("Estado atual do grafo com os pesos de cada aresta:\n");
-
-    for (int v = 0; v < grafo->numVertices; v++) {
-        printf("Vértice %d:", v);
-        Edge* arestaAtual = grafo->vertices[v].proxima;
-        while (arestaAtual != NULL) {
-            printf(" -> %d (%d)", arestaAtual->destino, arestaAtual->peso);
-            arestaAtual = arestaAtual->proxima;
+    printf("Estado atual do grafo:\n");
+    for (unsigned long int i = 0; i < grafo->numVertices; i++) {
+        printf("Vértice %lu:", i);
+        for (Edge* e = grafo->vertices[i].proxima; e != NULL; e = e->proxima) {
+            printf(" -> %lu (%lu)", e->destino, e->peso);
         }
         printf("\n");
     }
