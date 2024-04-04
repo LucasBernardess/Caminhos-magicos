@@ -92,7 +92,7 @@ ShortestPath* dijkstra(Graph* grafo, int origem) {
 
     // Criar e preencher a estrutura MenorCaminho*
     ShortestPath* shortestPath = (ShortestPath*)malloc(sizeof(ShortestPath));
-    shortestPath->caminho = (int*)malloc(numVertices * sizeof(int));
+    shortestPath->caminho = (int*)malloc((numVertices + 1) * sizeof(int)); // Aumento do tamanho do vetor
     shortestPath->comprimentoCaminho = 0;
     shortestPath->custo = caminhos[numVertices - 1].custo; // Custo do menor caminho até o último vértice
     // Preencher o caminho
@@ -102,11 +102,12 @@ ShortestPath* dijkstra(Graph* grafo, int origem) {
         if (shortestPath->comprimentoCaminho < numVertices) {
             shortestPath->caminho[shortestPath->comprimentoCaminho++] = temp;
         } else {
-            printf("Erro: comprimentoCaminho excede o tamanho do vetor caminho\n");
+            printf("Erro: comprimentoCaminho( %d ) excede o tamanho do vetor caminho ( %d )\n", shortestPath->comprimentoCaminho,numVertices);
             break;
         }
         temp = caminhos[temp].noAnterior;
     }
+    
     
     // Verificar se o índice final foi adicionado corretamente
     if (shortestPath->comprimentoCaminho < numVertices) {

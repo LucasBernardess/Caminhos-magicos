@@ -11,8 +11,8 @@ int processInputOutput(const char *inputFileName, const char *outputFileName) {
         return 0; // Falha
     }
 
-    int numCidades, numVoos, k, cidadeOrigem = 1;
-    if (fscanf(inputFile, "%d %d %d", &numCidades, &numVoos, &k) != 3) {
+    unsigned long int numCidades, numVoos, k, cidadeOrigem = 1;
+    if (fscanf(inputFile, "%ld %ld %ld", &numCidades, &numVoos, &k) != 3) {
         fprintf(stderr, "Formato de arquivo de entrada inválido.\n");
         fclose(inputFile);
         return 0; // Falha
@@ -26,9 +26,9 @@ int processInputOutput(const char *inputFileName, const char *outputFileName) {
     }
 
     Graph* grafo = criarGrafo(numCidades);
-    for (int i = 0; i < numVoos; i++) {
-        int cidadeA, cidadeB, preco;
-        if (fscanf(inputFile, "%d %d %d", &cidadeA, &cidadeB, &preco) != 3) {
+    for (long unsigned i = 0; i < numVoos; i++) {
+        unsigned long cidadeA, cidadeB, preco;
+        if (fscanf(inputFile, "%ld %ld %ld", &cidadeA, &cidadeB, &preco) != 3) {
             fprintf(stderr, "Erro ao ler os dados da aresta.\n");
             fclose(inputFile);
             liberarGrafo(grafo);

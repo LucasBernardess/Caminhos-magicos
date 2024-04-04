@@ -6,16 +6,12 @@
 #include <stdbool.h>
 
 ShortestPaths* alocarListaCaminhos() {
-    // Aloca espaço para a estrutura ShortestPaths
     ShortestPaths* listaCaminhos = (ShortestPaths*)malloc(sizeof(ShortestPaths));
-    if (listaCaminhos == NULL) {
-        // Tratamento de erro se a alocação falhar
-        printf("Erro ao alocar memória para a lista de MenoresCaminhos.\n");
+    if (!listaCaminhos) {
+        perror("Erro ao alocar memória para a lista de MenoresCaminhos");
         exit(EXIT_FAILURE);
     }
-
-    listaCaminhos->cabeca = NULL; // Inicializa a cabeça da lista como NULL
-
+    listaCaminhos->cabeca = NULL;
     return listaCaminhos;
 }
 
@@ -38,23 +34,26 @@ void liberarCaminho(ShortestPath* caminho) {
     }
 }
 
-ShortestPath* criarCaminho(int *caminho, int tamanhoCaminho, int custo) {
-    int* copia = (int*)malloc(tamanhoCaminho * sizeof(int));
-    if (!copia) return NULL; // Falha na alocação de memória
+ShortestPath* criarCaminho(int* caminho, int tamanhoCaminho, int custo) {
+    if (tamanhoCaminho <= 0) return NULL;
 
-    memcpy(copia, caminho, tamanhoCaminho * sizeof(int));
-    ShortestPath* novo = (ShortestPath*)malloc(sizeof(ShortestPath));
-    if (!novo) {
-        free(copia); // Liberar a memória do novo caminho em caso de falha na alocação
+    int* copiaCaminho = (int*)malloc(tamanhoCaminho * sizeof(int));
+    ShortestPath* novoCaminho = (ShortestPath*)malloc(sizeof(ShortestPath));
+
+    if (!copiaCaminho || !novoCaminho) {
+        free(copiaCaminho); // Previne vazamento de memória caso a alocação de 'novoCaminho' falhe
+        free(novoCaminho);
         return NULL;
     }
 
-    novo->caminho = copia;
-    novo->comprimentoCaminho = tamanhoCaminho;
-    novo->custo = custo;
-    novo->prox = NULL;
+    memcpy(copiaCaminho, caminho, tamanhoCaminho * sizeof(int));
 
-    return novo;
+    novoCaminho->caminho = copiaCaminho;
+    novoCaminho->comprimentoCaminho = tamanhoCaminho;
+    novoCaminho->custo = custo;
+    novoCaminho->prox = NULL;
+
+    return novoCaminho;
 }
 
 ShortestPath* buscaMenorCustoNaLista(ShortestPaths* caminhos) {
@@ -79,39 +78,6 @@ void inserirMenorCaminho(ShortestPaths* listaCaminhos, ShortestPath* novoCaminho
     listaCaminhos->cabeca = novoCaminho; 
 }
 
-void removerCaminhoEspecifico(ShortestPaths* lista, ShortestPath* caminhoParaRemover) {
-    ShortestPath* atual = lista->cabeca;
-    ShortestPath* anterior = NULL;
-
-    while (atual != NULL) {
-        if (atual == caminhoParaRemover) { // Encontramos o caminho a ser removido
-            if (anterior == NULL) {
-                // O caminho a ser removido é o primeiro da lista
-                lista->cabeca = atual->prox;
-            } else {
-                // O caminho a ser removido está no meio ou no final da lista
-                anterior->prox = atual->prox;
-            }
-            // Não liberamos o caminho aqui pois ele será utilizado em outro lugar
-            break;
-        }
-        anterior = atual;
-        atual = atual->prox;
-    }
-}
-
-void removerProximaArestaCaminhoPrincipal(Graph* grafoTemporario, ShortestPaths* caminhos, int i) {
-    if (i >= caminhos->cabeca->comprimentoCaminho - 1) {
-        // Não há aresta "próxima" para remover se estivermos no último vértice do caminho
-        return;
-    }
-    
-    int origem = caminhos->cabeca->caminho[i];
-    int destino = caminhos->cabeca->caminho[i + 1];
-    
-    removerAresta(grafoTemporario, origem, destino);
-}
-
 bool verificaCaminho(ShortestPaths* caminhos, ShortestPath* caminhoTeste) {
     ShortestPath* atual = caminhos->cabeca;
     while (atual != NULL) {
@@ -132,32 +98,6 @@ bool verificaCaminho(ShortestPaths* caminhos, ShortestPath* caminhoTeste) {
     }
     // Se nenhum caminho idêntico foi encontrado, retornar false
     return false;
-}
-
-
-void removerArestasNaoPertencentesAoCaminho(Graph* grafo, ShortestPath* caminho) {
-    if (grafo == NULL || caminho == NULL || caminho->comprimentoCaminho <= 0) return;
-    // Percorre cada vértice no caminho, exceto o último
-    int indiceVertice = 0;
-    while (indiceVertice < caminho->comprimentoCaminho - 1) {
-        int idOrigem = caminho->caminho[indiceVertice];
-        int idDestino = caminho->caminho[indiceVertice + 1];
-        
-        // Procura a aresta que conecta o vértice de origem ao vértice de destino
-        Edge **ponteiroAresta = &grafo->vertices[idOrigem].proxima;
-        while (*ponteiroAresta != NULL) {
-            if ((*ponteiroAresta)->destino == idDestino) {
-                ponteiroAresta = &(*ponteiroAresta)->proxima;
-            } else {
-                // Remove a aresta que não faz parte do caminho
-                Edge* arestaRemovida = *ponteiroAresta;
-                *ponteiroAresta = (*ponteiroAresta)->proxima; // Atualiza o ponteiro para pular a aresta removida
-                free(arestaRemovida);
-                break; // Sai do loop após remover a aresta
-            }
-        }
-        indiceVertice++;
-    }
 }
 
 void inverterListaCaminhos(ShortestPaths* caminhos) {
