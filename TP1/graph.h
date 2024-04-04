@@ -31,8 +31,7 @@ Graph* criarGrafo(int numVertices);
 void adicionarAresta(Graph* grafo, int origem, int destino, int peso);
 void liberarGrafo(Graph* grafo);
 void removerAresta(Graph *grafo, int src, int dest);
-void imprimirGrafo(Graph* grafo);
 void copiarGrafo(Graph* grafoOrigem, Graph* grafoDestino);
-void restaurarGrafo(Graph* grafo, Graph* grafoTemporario);
+void imprimirGrafo(Graph* grafo);
 
 #endif

@@ -74,20 +74,6 @@ void removerAresta(Graph* grafo, int origem, int destino) {
     }
 }
 
-void imprimirGrafo(Graph* grafo) {
-    printf("Estado atual do grafo com os pesos de cada aresta:\n");
-
-    for (int v = 0; v < grafo->numVertices; v++) {
-        printf("Vértice %d:", v);
-        Edge* arestaAtual = grafo->vertices[v].proxima;
-        while (arestaAtual != NULL) {
-            printf(" -> %d (%d)", arestaAtual->destino, arestaAtual->peso);
-            arestaAtual = arestaAtual->proxima;
-        }
-        printf("\n");
-    }
-}
-
 void copiarGrafo(Graph* origem, Graph* destino) {
     // Certifica-se de que a memória atualmente alocada para destino->vertices seja liberada, se existir
     if (destino->vertices != NULL) {
@@ -131,40 +117,16 @@ void copiarGrafo(Graph* origem, Graph* destino) {
     }
 }
 
-void restaurarGrafo(Graph* grafo, Graph* grafoTemporario) {
-    int numVertices = grafo->numVertices;
+void imprimirGrafo(Graph* grafo) {
+    printf("Estado atual do grafo com os pesos de cada aresta:\n");
 
-    for (int i = 0; i < numVertices; i++) {
-        grafoTemporario->vertices[i].custo = grafo->vertices[i].custo;
-        grafoTemporario->vertices[i].noAnterior = grafo->vertices[i].noAnterior;
-
-        // Remove todas as arestas do grafo temporário
-        Edge* atualTemp = grafoTemporario->vertices[i].proxima;
-        while (atualTemp != NULL) {
-            Edge* temp = atualTemp;
-            atualTemp = atualTemp->proxima;
-            free(temp);
+    for (int v = 0; v < grafo->numVertices; v++) {
+        printf("Vértice %d:", v);
+        Edge* arestaAtual = grafo->vertices[v].proxima;
+        while (arestaAtual != NULL) {
+            printf(" -> %d (%d)", arestaAtual->destino, arestaAtual->peso);
+            arestaAtual = arestaAtual->proxima;
         }
-        grafoTemporario->vertices[i].proxima = NULL;
-
-        // Copia as arestas do grafo original de volta para o grafo temporário
-        Edge* atualOriginal = grafo->vertices[i].proxima;
-        Edge* anterior = NULL;
-        while (atualOriginal != NULL) {
-            Edge* novaAresta = (Edge*)malloc(sizeof(Edge));
-            novaAresta->destino = atualOriginal->destino;
-            novaAresta->peso = atualOriginal->peso;
-            novaAresta->proxima = NULL;
-
-            // Insere a nova aresta no grafo temporário
-            if (anterior == NULL) {
-                grafoTemporario->vertices[i].proxima = novaAresta;
-            } else {
-                anterior->proxima = novaAresta;
-            }
-
-            anterior = novaAresta;
-            atualOriginal = atualOriginal->proxima;
-        }
+        printf("\n");
     }
 }

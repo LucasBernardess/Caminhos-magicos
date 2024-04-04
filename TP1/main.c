@@ -9,11 +9,14 @@
 #include "yen.h"
 
 int main(int argc, char **argv) {
+    // Estruturas para medir o tempo de execução
     struct timeval start, end;
     struct rusage usageStart, usageEnd;
+    // Inicialização das vbariáveis TXT
     char *inputFileName = NULL, *outputFileName = NULL;
     int opt;
 
+    // Processa argumentos da linha de comando
     while ((opt = getopt(argc, argv, "i:o:")) != -1) {
         switch (opt) {
             case 'i': inputFileName = optarg; break;
@@ -24,22 +27,27 @@ int main(int argc, char **argv) {
         }
     }
 
+    // Verifica se os nomes dos arquivos foram fornecidos
     if (!inputFileName || !outputFileName) {
         fprintf(stderr, "Arquivos de entrada e/ou saída não especificados!\n");
         return EXIT_FAILURE;
     }
 
+    // Inicia a medição do tempo
     gettimeofday(&start, NULL);
     getrusage(RUSAGE_SELF, &usageStart);
 
+    // Processa os arquivos de entrada e saída
     if (!processInputOutput(inputFileName, outputFileName)) {
         fprintf(stderr, "Falha no processamento dos arquivos.\n");
         return EXIT_FAILURE;
     }
 
+    // Finaliza a medição do tempo
     gettimeofday(&end, NULL);
     getrusage(RUSAGE_SELF, &usageEnd);
 
+    // Calcula e exibe o tempo de execução
     double elapsed = (end.tv_sec - start.tv_sec) + (end.tv_usec - start.tv_usec) / 1e6;
     double userTime = (usageEnd.ru_utime.tv_sec - usageStart.ru_utime.tv_sec) + 
                       (usageEnd.ru_utime.tv_usec - usageStart.ru_utime.tv_usec) / 1e6;

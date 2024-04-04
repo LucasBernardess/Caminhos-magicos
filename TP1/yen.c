@@ -5,11 +5,6 @@
 #include <stdio.h>
 #include <limits.h>
 
-void imprimirCaminho(ShortestPath* caminho) {
-    printf("Caminho: ");
-    printf(" - Custo: %d\n", caminho->custo);
-}
-
 void removerArestasYen(Graph* grafoCopia, ShortestPaths* caminhos, ShortestPath* rootPath, int spurNode) {
     removerAresta(grafoCopia, caminhos->cabeca->caminho[spurNode-1], caminhos->cabeca->caminho[spurNode]);
     ShortestPath* aux = caminhos->cabeca->prox;
@@ -60,7 +55,7 @@ ShortestPaths* yen(Graph* grafo, int origem, int k) {
             }
 
             Graph* grafoTemporario = criarGrafo(grafo->numVertices);
-            restaurarGrafo(grafo, grafoTemporario);
+            copiarGrafo(grafo, grafoTemporario);
             ShortestPath* rootPath = criarCaminho(vetor, j, 0);
             definirRootPath(grafoTemporario, rootPath);
             removerArestasYen(grafoTemporario, caminhos, rootPath, j);
@@ -93,10 +88,9 @@ ShortestPaths* yen(Graph* grafo, int origem, int k) {
         if (minimo != NULL) {
             ShortestPath* copiaMinimo = criarCaminho(minimo->caminho, minimo->comprimentoCaminho, minimo->custo);
             inserirMenorCaminho(caminhos, copiaMinimo);
-            imprimirCaminho(minimo);
-            //removerCaminhoEspecifico(caminhosAuxiliares, minimo);
         }
     }
+    imprimirCaminhos(caminhos);
 
     liberarListaDeCaminhos(caminhosAuxiliares);
     return caminhos;

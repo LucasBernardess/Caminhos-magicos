@@ -56,18 +56,6 @@ ShortestPath* criarCaminho(int* caminho, int tamanhoCaminho, int custo) {
     return novoCaminho;
 }
 
-ShortestPath* buscaMenorCustoNaLista(ShortestPaths* caminhos) {
-    ShortestPath* atual = caminhos->cabeca;
-    ShortestPath* menorCusto = atual;
-    while (atual != NULL) {
-        if (atual->custo < menorCusto->custo) {
-            menorCusto = atual;
-        }
-        atual = atual->prox;
-    }
-    return menorCusto;
-}
-
 void inserirMenorCaminho(ShortestPaths* listaCaminhos, ShortestPath* novoCaminho) {
     if (listaCaminhos == NULL || novoCaminho == NULL) {
         printf("Erro: Lista de Menores Caminhos ou novo caminho inválidos.\n");
@@ -97,6 +85,19 @@ bool verificaCaminho(ShortestPaths* caminhos, ShortestPath* caminhoTeste) {
         atual = atual->prox;
     }
     // Se nenhum caminho idêntico foi encontrado, retornar false
+    return false;
+}
+
+bool caminhoJaExiste(ShortestPaths* caminhosPrincipais, ShortestPaths* caminhosAuxiliares, ShortestPath* caminhoEncontrado) {
+    // Verifica se o caminho já existe na lista principal
+    if (verificaCaminho(caminhosPrincipais, caminhoEncontrado)) {
+        return true;
+    }
+    // Verifica se o caminho já existe na lista auxiliar
+    if (verificaCaminho(caminhosAuxiliares, caminhoEncontrado)) {
+        return true;
+    }
+
     return false;
 }
 
@@ -135,47 +136,3 @@ void imprimirCaminhos(ShortestPaths* caminhos) {
         index++;
     }
 }
-
-void removerCaminho(ShortestPaths* caminhos, ShortestPath* caminho) {
-    if (caminhos == NULL || caminho == NULL) {
-        printf("Erro: Lista de caminhos ou caminho inválido.\n");
-        return;
-    }
-
-    ShortestPath* atual = caminhos->cabeca;
-    ShortestPath* anterior = NULL;
-
-    while (atual != NULL) {
-        if (atual == caminho) { // Encontramos o caminho a ser removido
-            if (anterior == NULL) {
-                // O caminho a ser removido é o primeiro da lista
-                caminhos->cabeca = atual->prox;
-            } else {
-                // O caminho a ser removido está no meio ou no final da lista
-                anterior->prox = atual->prox;
-            }
-            // Libera a memória alocada para o caminho removido
-            liberarCaminho(atual);
-            return;
-        }
-        anterior = atual;
-        atual = atual->prox;
-    }
-
-    printf("Erro: Caminho não encontrado na lista.\n");
-}
-
-bool caminhoJaExiste(ShortestPaths* caminhosPrincipais, ShortestPaths* caminhosAuxiliares, ShortestPath* caminhoEncontrado) {
-    // Verifica se o caminho já existe na lista principal
-    if (verificaCaminho(caminhosPrincipais, caminhoEncontrado)) {
-        return true;
-    }
-    // Verifica se o caminho já existe na lista auxiliar
-    if (verificaCaminho(caminhosAuxiliares, caminhoEncontrado)) {
-        return true;
-    }
-
-    return false;
-}
-
-
