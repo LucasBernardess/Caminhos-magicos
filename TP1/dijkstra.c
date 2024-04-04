@@ -85,7 +85,6 @@ ShortestPath* dijkstra(Graph* grafo, int origem) {
 
     // Verificar se o destino foi alcançado
     if (caminhos[numVertices - 1].custo == INT_MAX) {
-        printf("Destino não pode ser alcançado a partir da origem %d.\n", origem);
         free(caminhos);
         free(heap);
         return NULL;
@@ -123,12 +122,6 @@ ShortestPath* dijkstra(Graph* grafo, int origem) {
         shortestPath->caminho[shortestPath->comprimentoCaminho - i - 1] = temp;
     }
 
-    printf("Caminho invertido:\n");
-    for (int i = 0; i < shortestPath->comprimentoCaminho; i++) {
-        printf("%d ", shortestPath->caminho[i]);
-    }
-    printf("Custo: %d", shortestPath->custo);
-    printf("\n");
 
     free(caminhos);
     free(heap);

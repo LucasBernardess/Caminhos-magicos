@@ -7,9 +7,6 @@
 
 void imprimirCaminho(ShortestPath* caminho) {
     printf("Caminho: ");
-    for (int i = 0; i < caminho->comprimentoCaminho; i++) {
-        printf("%d ", caminho->caminho[i]);
-    }
     printf(" - Custo: %d\n", caminho->custo);
 }
 
@@ -56,37 +53,24 @@ ShortestPaths* yen(Graph* grafo, int origem, int k) {
     ShortestPaths *caminhosAuxiliares = alocarListaCaminhos();
 
     for (int i = 0; i < k - 1; i++) {
-        printf("Iteração %d:\n", i);
-        printf("Caminhos na Iteração %d:\n", i);
-        imprimirCaminhos(caminhos);
-        
         for (int j = 1; j < caminhos->cabeca->comprimentoCaminho; j++) {
-            printf("Gerando caminhos auxiliares para segmento %d do caminho principal...\n", j);
             int* vetor = (int*)malloc(j * sizeof(int));
             for (int r = 0; r < j; r++) {
                 vetor[r] = caminhos->cabeca->caminho[r];
             }
+
             Graph* grafoTemporario = criarGrafo(grafo->numVertices);
             restaurarGrafo(grafo, grafoTemporario);
             ShortestPath* rootPath = criarCaminho(vetor, j, 0);
-            // Chamada modificada aqui
-            // Chama definirRootPath antes de removerArestasYen
             definirRootPath(grafoTemporario, rootPath);
             removerArestasYen(grafoTemporario, caminhos, rootPath, j);
             
-            printf("RootPath encontrado: ");
-            imprimirCaminho(rootPath);
-            imprimirGrafo(grafoTemporario);
             ShortestPath* caminho = dijkstra(grafoTemporario, origem);
             
             if (caminho != NULL && !caminhoJaExiste(caminhos, caminhosAuxiliares, caminho)) {
-                printf("Novo caminho auxiliar encontrado.\n");
-                imprimirCaminho(caminho);
                 inserirMenorCaminho(caminhosAuxiliares, caminho);
             } else {
-                printf("Caminho já existe nos caminhos principais ou auxiliares. Ignorando...\n");
                 if (caminho != NULL) {
-                    imprimirCaminho(caminho);
                     liberarCaminho(caminho);
                 }
             }
@@ -94,9 +78,6 @@ ShortestPaths* yen(Graph* grafo, int origem, int k) {
             liberarCaminho(rootPath);
             liberarGrafo(grafoTemporario);
         }
-
-        printf("Caminhos Auxiliares na Iteração %d:\n", i+1);
-        imprimirCaminhos(caminhosAuxiliares);
 
         ShortestPath* minimo = NULL;
         int menorCusto = INT_MAX;
@@ -106,14 +87,13 @@ ShortestPaths* yen(Graph* grafo, int origem, int k) {
                 minimo = atual;
                 menorCusto = atual->custo;
             }
-            imprimirCaminho(atual);
             atual = atual->prox;
         }
 
         if (minimo != NULL) {
-            printf("Inserindo o menor caminho auxiliar encontrado na lista de caminhos principais...\n");
             ShortestPath* copiaMinimo = criarCaminho(minimo->caminho, minimo->comprimentoCaminho, minimo->custo);
             inserirMenorCaminho(caminhos, copiaMinimo);
+            imprimirCaminho(minimo);
             //removerCaminhoEspecifico(caminhosAuxiliares, minimo);
         }
     }
